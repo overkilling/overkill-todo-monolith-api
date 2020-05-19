@@ -4,12 +4,19 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 )
 
 func main() {
 	r := chi.NewRouter()
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("welcome"))
+
+	r.Use(middleware.RequestID)
+	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer)
+	r.Use(middleware.Heartbeat("/ping"))
+
+	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("ok"))
 	})
 	http.ListenAndServe(":3000", r)
 }
