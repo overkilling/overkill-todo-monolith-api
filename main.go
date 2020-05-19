@@ -11,7 +11,7 @@ func healthcheckHander(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("ok"))
 }
 
-func main() {
+func router() http.Handler {
 	r := chi.NewRouter()
 
 	r.Use(middleware.RequestID)
@@ -21,5 +21,9 @@ func main() {
 
 	r.Get("/health", healthcheckHander)
 
-	http.ListenAndServe(":3000", r)
+	return r
+}
+
+func main() {
+	http.ListenAndServe(":3000", router())
 }
