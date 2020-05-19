@@ -13,7 +13,7 @@ func TestUnitHealthcheckHandler(t *testing.T) {
 	res := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "http://localhost:3000/health", nil)
 
-	healthcheckHander(res, req)
+	healthcheckHandler(res, req)
 
 	content, _ := ioutil.ReadAll(res.Body)
 	assert.Equal(t, "ok", string(content))

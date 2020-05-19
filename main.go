@@ -1,14 +1,43 @@
 package main
 
 import (
+	"database/sql"
+	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+
+	_ "github.com/lib/pq"
 )
 
-func healthcheckHander(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("ok"))
+const (
+	host     = "localhost"
+	port     = 5432
+	user     = "postgres"
+	password = "postgres"
+	dbname   = "todo"
+)
+
+func db() *sql.DB {
+	psqlInfo := fmt.Sprintf(
+		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+		host, port, user, password, dbname)
+	db, err := sql.Open("postgres", psqlInfo)
+	if err != nil {
+		panic(err)
+	}
+
+	return db
+}
+
+func healthcheckHandler(w http.ResponseWriter, r *http.Request) {
+	result := "ok"
+	err := db().Ping()
+	if err != nil {
+		result = "db down"
+	}
+	w.Write([]byte(result))
 }
 
 func router() http.Handler {
@@ -19,7 +48,7 @@ func router() http.Handler {
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Heartbeat("/ping"))
 
-	r.Get("/health", healthcheckHander)
+	r.Get("/health", healthcheckHandler)
 
 	return r
 }
