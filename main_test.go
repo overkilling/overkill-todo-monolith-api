@@ -4,26 +4,40 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-type mockDB struct{}
+type mockDB struct {
+	alive bool
+}
 
 func (db mockDB) Alive() bool {
-	return true
+	return db.alive
 }
 
 func TestUnitHealthcheckHandler(t *testing.T) {
-	db := mockDB{}
-	res := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "http://localhost:3000/health", nil)
+	testCases := []struct {
+		alive    bool
+		expected string
+	}{
+		{alive: true, expected: "ok"},
+		{alive: false, expected: "db down"},
+	}
+	for _, tC := range testCases {
+		t.Run(strconv.FormatBool(tC.alive), func(t *testing.T) {
+			db := mockDB{alive: tC.alive}
+			res := httptest.NewRecorder()
+			req, _ := http.NewRequest("GET", "http://localhost:3000/health", nil)
 
-	healthcheckHandler(db)(res, req)
+			healthcheckHandler(db)(res, req)
 
-	content, _ := ioutil.ReadAll(res.Body)
-	assert.Equal(t, "ok", string(content))
+			content, _ := ioutil.ReadAll(res.Body)
+			assert.Equal(t, tC.expected, string(content))
+		})
+	}
 }
 
 func TestIntegrationRouter(t *testing.T) {
