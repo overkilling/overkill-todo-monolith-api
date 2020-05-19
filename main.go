@@ -7,6 +7,10 @@ import (
 	"github.com/go-chi/chi/middleware"
 )
 
+func healthcheckHander(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("ok"))
+}
+
 func main() {
 	r := chi.NewRouter()
 
@@ -15,8 +19,7 @@ func main() {
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Heartbeat("/ping"))
 
-	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("ok"))
-	})
+	r.Get("/health", healthcheckHander)
+
 	http.ListenAndServe(":3000", r)
 }
