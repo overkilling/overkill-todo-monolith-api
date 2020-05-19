@@ -11,6 +11,18 @@ import (
 	_ "github.com/lib/pq"
 )
 
+type database interface {
+	Alive() bool
+}
+
+type wrappedSQLDb struct {
+	sqlDb *sql.DB
+}
+
+func (db wrappedSQLDb) Alive() bool {
+	return db.sqlDb.Ping() == nil
+}
+
 const (
 	host     = "localhost"
 	port     = 5432
@@ -19,7 +31,7 @@ const (
 	dbname   = "todo"
 )
 
-func db() *sql.DB {
+func newDb() database {
 	psqlInfo := fmt.Sprintf(
 		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
@@ -28,13 +40,12 @@ func db() *sql.DB {
 		panic(err)
 	}
 
-	return db
+	return wrappedSQLDb{sqlDb: db}
 }
 
 func healthcheckHandler(w http.ResponseWriter, r *http.Request) {
 	result := "ok"
-	err := db().Ping()
-	if err != nil {
+	if !newDb().Alive() {
 		result = "db down"
 	}
 	w.Write([]byte(result))
