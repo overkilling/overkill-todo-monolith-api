@@ -43,15 +43,18 @@ func newDb() database {
 	return wrappedSQLDb{sqlDb: db}
 }
 
-func healthcheckHandler(w http.ResponseWriter, r *http.Request) {
-	result := "ok"
-	if !newDb().Alive() {
-		result = "db down"
+func healthcheckHandler(db database) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		result := "db down"
+		if db.Alive() {
+			result = "ok"
+		}
+		w.Write([]byte(result))
 	}
-	w.Write([]byte(result))
 }
 
 func router() http.Handler {
+	db := newDb()
 	r := chi.NewRouter()
 
 	r.Use(middleware.RequestID)
@@ -59,7 +62,7 @@ func router() http.Handler {
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Heartbeat("/ping"))
 
-	r.Get("/health", healthcheckHandler)
+	r.Get("/health", healthcheckHandler(db))
 
 	return r
 }
