@@ -23,7 +23,14 @@ func healthcheckHandler(dbServiceAlive serviceUpCheck) http.HandlerFunc {
 }
 
 func router(dbName string) http.Handler {
-	db := postgres.NewDb(dbName)
+	db := postgres.NewDb(
+		postgres.ConfigOption{Option: "dbname", Value: dbName},
+		postgres.ConfigOption{Option: "host", Value: "localhost"},
+		postgres.ConfigOption{Option: "port", Value: "5432"},
+		postgres.ConfigOption{Option: "user", Value: "postgres"},
+		postgres.ConfigOption{Option: "password", Value: "postgres"},
+		postgres.ConfigOption{Option: "sslmode", Value: "disable"},
+	)
 	r := chi.NewRouter()
 
 	r.Use(middleware.RequestID)
