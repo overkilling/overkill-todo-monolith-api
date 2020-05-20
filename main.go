@@ -10,14 +10,12 @@ import (
 	_ "github.com/lib/pq"
 )
 
-type dbAlive interface {
-	Alive() bool
-}
+type serviceUpCheck func() bool
 
-func healthcheckHandler(db dbAlive) http.HandlerFunc {
+func healthcheckHandler(dbServiceAlive serviceUpCheck) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		result := "db down"
-		if db.Alive() {
+		if dbServiceAlive() {
 			result = "ok"
 		}
 		w.Write([]byte(result))
@@ -33,7 +31,7 @@ func router(dbName string) http.Handler {
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Heartbeat("/ping"))
 
-	r.Get("/health", healthcheckHandler(db))
+	r.Get("/health", healthcheckHandler(db.Alive))
 
 	return r
 }
