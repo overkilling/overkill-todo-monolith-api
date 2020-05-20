@@ -28,10 +28,9 @@ const (
 	port     = 5432
 	user     = "postgres"
 	password = "postgres"
-	dbname   = "todo"
 )
 
-func newDb() database {
+func newDb(dbname string) database {
 	psqlInfo := fmt.Sprintf(
 		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
@@ -53,8 +52,8 @@ func healthcheckHandler(db database) http.HandlerFunc {
 	}
 }
 
-func router() http.Handler {
-	db := newDb()
+func router(dbName string) http.Handler {
+	db := newDb(dbName)
 	r := chi.NewRouter()
 
 	r.Use(middleware.RequestID)
@@ -68,5 +67,5 @@ func router() http.Handler {
 }
 
 func main() {
-	http.ListenAndServe(":3000", router())
+	http.ListenAndServe(":3000", router("todo"))
 }
