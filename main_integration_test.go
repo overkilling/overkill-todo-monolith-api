@@ -14,14 +14,16 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+var dbBaseConfig = []postgres.ConfigOption{
+	postgres.Credentials("postgres", "postgres"),
+	postgres.HostAndPort("localhost", 5432),
+	postgres.SslDisabled(),
+}
+
 func recreateTestDb(dbName string) {
 	var err error
 
-	db, err := postgres.NewDb(
-		postgres.Credentials("postgres", "postgres"),
-		postgres.HostAndPort("localhost", 5432),
-		postgres.SslDisabled(),
-	)
+	db, err := postgres.NewDb(dbBaseConfig...)
 	if err != nil {
 		panic(err)
 	}
@@ -39,11 +41,15 @@ func recreateTestDb(dbName string) {
 
 func TestIntegrationRouter(t *testing.T) {
 	recreateTestDb("todo_test")
+	db, err := postgres.NewDb(append(dbBaseConfig, postgres.DbName("todo_test"))...)
+	if err != nil {
+		panic(err)
+	}
 
 	res := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "http://localhost:3000/health", nil)
 
-	router("todo_test").ServeHTTP(res, req)
+	router(db).ServeHTTP(res, req)
 
 	content, _ := ioutil.ReadAll(res.Body)
 	assert.Equal(t, "ok", string(content))

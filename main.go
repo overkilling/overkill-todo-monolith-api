@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"net/http"
 
 	"github.com/go-chi/chi"
@@ -22,13 +23,7 @@ func healthcheckHandler(dbServiceAlive serviceUpCheck) http.HandlerFunc {
 	}
 }
 
-func router(dbName string) http.Handler {
-	db, _ := postgres.NewDb(
-		postgres.DbName(dbName),
-		postgres.Credentials("postgres", "postgres"),
-		postgres.HostAndPort("localhost", 5432),
-		postgres.SslDisabled(),
-	)
+func router(db *sql.DB) http.Handler {
 	r := chi.NewRouter()
 
 	r.Use(middleware.RequestID)
@@ -42,5 +37,15 @@ func router(dbName string) http.Handler {
 }
 
 func main() {
-	http.ListenAndServe(":3000", router("todo"))
+	db, err := postgres.NewDb(
+		postgres.DbName("todo"),
+		postgres.Credentials("postgres", "postgres"),
+		postgres.HostAndPort("localhost", 5432),
+		postgres.SslDisabled(),
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	http.ListenAndServe(":3000", router(db))
 }
