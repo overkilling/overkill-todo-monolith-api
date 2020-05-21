@@ -3,7 +3,6 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -11,13 +10,18 @@ import (
 	"testing"
 
 	_ "github.com/lib/pq"
+	"github.com/overkilling/overkill-todo-monolith-api/postgres"
 	"github.com/stretchr/testify/assert"
 )
 
 func recreateTestDb(dbName string) {
 	var err error
 
-	db, err := sql.Open("postgres", "user=postgres password=postgres sslmode=disable")
+	db, err := postgres.NewDb(
+		postgres.Credentials("postgres", "postgres"),
+		postgres.HostAndPort("localhost", 5432),
+		postgres.SslDisabled(),
+	)
 	if err != nil {
 		panic(err)
 	}
