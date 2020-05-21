@@ -1,14 +1,21 @@
 package postgres
 
 import (
+	"database/sql"
 	"fmt"
 	"strconv"
 	"strings"
 )
 
-type configBuilder func(string, string)
+// NewDb returns a new database access object for a postgres database, from
+// a set of configuration options.
+func NewDb(configs ...configOption) (*sql.DB, error) {
+	return sql.Open("postgres", toConnString(configs))
+}
 
 type configOption func(configBuilder)
+
+type configBuilder func(string, string)
 
 type connStrConfig struct {
 	builder strings.Builder

@@ -36,7 +36,7 @@ func router(dbName string) http.Handler {
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Heartbeat("/ping"))
 
-	r.Get("/health", healthcheckHandler(db.Alive))
+	r.Get("/health", healthcheckHandler(func() bool { return db.Ping() == nil }))
 
 	return r
 }
