@@ -7,37 +7,27 @@ on:
     branches: [ master ]
 
 jobs:
-
-  build:
-    name: Build
+  test:
     runs-on: ubuntu-latest
+    services:
+      db:
+        image: postgres:latest
+        ports:
+          - "5432:5432"
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: todo
     steps:
-
-    - name: Set up Go 1.x
-      uses: actions/setup-go@v2
-      with:
-        go-version: ^1.13
-      id: go
-
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v2
-
-    - name: Get dependencies
-      run: |
-        go get -v -t -d ./...
-        if [ -f Gopkg.toml ]; then
-            curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-            dep ensure
-        fi
-
-    - name: Build
-      run: go build -v .
-
-    - name: Start DB
-      run: docker-compose up -d db
-
-    - name: Test
-      run: go test -v ./...
-
-    - name: Integration Test
-      run: go test -v -tags integration ./...
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ^1.13
+      - name: Install dependencies
+        run: go mod download
+      - name: Build package
+        run: go build -v .
+      - name: Run all tests
+        run: go test -v -tags integration ./...
