@@ -16,10 +16,12 @@ RUN wget https://github.com/pact-foundation/pact-ruby-standalone/releases/downlo
   && tar xzf pact-1.84.0-linux-x86_64.tar.gz
 ENV PATH /deps/pact/bin:$PATH
 
-# Copy project and install dependencies
+# Install dependencies and copy project
 WORKDIR /build 
-COPY . .
+COPY go.mod .
+COPY go.sum .
 RUN go mod download
+COPY . .
 
 # Run pact tests
 CMD go test -v ./... -tags pact -run TestPactProvider
