@@ -5,6 +5,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"testing"
 
 	_ "github.com/lib/pq"
@@ -15,7 +16,7 @@ import (
 
 var dbBaseConfig = []postgres.ConfigOption{
 	postgres.Credentials("postgres", "postgres"),
-	postgres.HostAndPort("localhost", 5432),
+	postgres.HostAndPort(os.Getenv("DB_HOST"), 5432),
 	postgres.SslDisabled(),
 }
 

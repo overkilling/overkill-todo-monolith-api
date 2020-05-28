@@ -29,8 +29,10 @@ jobs:
         run: go mod download
       - name: Build package
         run: go build -v .
-      - name: Run all tests
+      - name: Run unit and integration tests
         run: go test -v -tags integration ./...
+      - name: Run pact tests
+        run: docker-compose -f docker-compose.pact.yml up --build --abort-on-container-exit
 
   build-and-push-container:
     runs-on: ubuntu-latest
