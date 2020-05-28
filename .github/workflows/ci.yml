@@ -9,15 +9,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    services:
-      db:
-        image: postgres:latest
-        ports:
-          - "5432:5432"
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: todo
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -29,10 +20,8 @@ jobs:
         run: go mod download
       - name: Build package
         run: go build -v .
-      - name: Run unit and integration tests
-        run: go test -v -tags integration ./...
-      - name: Run pact tests
-        run: docker-compose -f docker-compose.pact.yml up --build --abort-on-container-exit
+      - name: Run ci tests
+        run: make all
 
   build-and-push-container:
     runs-on: ubuntu-latest
