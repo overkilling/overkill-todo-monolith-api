@@ -23,8 +23,8 @@ func TestUnitHealthcheckHandler(t *testing.T) {
 		alive    bool
 		expected string
 	}{
-		{alive: true, expected: "ok"},
-		{alive: false, expected: "db down"},
+		{alive: true, expected: "{\"status\":\"ok\"}"},
+		{alive: false, expected: "{\"status\":\"fail\"}"},
 	}
 	for _, tC := range testCases {
 		t.Run(strconv.FormatBool(tC.alive), func(t *testing.T) {

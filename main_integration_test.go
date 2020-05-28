@@ -52,5 +52,5 @@ func TestIntegrationRouter(t *testing.T) {
 	router(db).ServeHTTP(res, req)
 
 	content, _ := ioutil.ReadAll(res.Body)
-	assert.Equal(t, "ok", string(content))
+	assert.Equal(t, "{\"status\":\"ok\"}", string(content))
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"net/http"
 
 	"github.com/go-chi/chi"
@@ -14,12 +15,18 @@ import (
 type serviceUpCheck func() bool
 
 func healthcheckHandler(dbServiceAlive serviceUpCheck) http.HandlerFunc {
+	type HealthcheckResponse struct {
+		Status string `json:"status"`
+	}
 	return func(w http.ResponseWriter, r *http.Request) {
-		result := "db down"
+		status := "fail"
 		if dbServiceAlive() {
-			result = "ok"
+			status = "ok"
 		}
-		w.Write([]byte(result))
+		response := HealthcheckResponse{status}
+		responseBytes, _ := json.Marshal(response)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(responseBytes)
 	}
 }
 
