@@ -1,3 +1,5 @@
+PACT_DOCKER_COMPOSE := docker-compose -f docker-compose.pact.yml
+
 .PHONY: all
 all: test integration pact
 
@@ -20,5 +22,5 @@ integration:
 .PHONY: pact
 pact:
 	@echo "===Pact==="
-	docker-compose -f docker-compose.pact.yml up --build --abort-on-container-exit
-	docker-compose -f docker-compose.pact.yml down --volumes
+	$(PACT_DOCKER_COMPOSE) up --build --abort-on-container-exit
+	$(PACT_DOCKER_COMPOSE) down --volumes
