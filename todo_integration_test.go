@@ -1,6 +1,6 @@
 // +build integration
 
-package main
+package todo
 
 import (
 	"fmt"
@@ -49,7 +49,7 @@ func TestIntegrationRouter(t *testing.T) {
 	res := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "http://localhost:3000/health", nil)
 
-	router(db).ServeHTTP(res, req)
+	Router(db).ServeHTTP(res, req)
 
 	content, _ := ioutil.ReadAll(res.Body)
 	assert.Equal(t, "{\"status\":\"ok\"}", string(content))

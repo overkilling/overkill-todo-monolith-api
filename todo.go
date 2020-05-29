@@ -1,4 +1,4 @@
-package main
+package todo
 
 import (
 	"database/sql"
@@ -7,9 +7,6 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-	"github.com/overkilling/overkill-todo-monolith-api/postgres"
-
-	_ "github.com/lib/pq"
 )
 
 type serviceUpCheck func() bool
@@ -30,7 +27,8 @@ func healthcheckHandler(dbServiceAlive serviceUpCheck) http.HandlerFunc {
 	}
 }
 
-func router(db *sql.DB) http.Handler {
+// Router provides REST endpoint routing for the Todo API
+func Router(db *sql.DB) http.Handler {
 	r := chi.NewRouter()
 
 	r.Use(middleware.RequestID)
@@ -41,18 +39,4 @@ func router(db *sql.DB) http.Handler {
 	r.Get("/health", healthcheckHandler(func() bool { return db.Ping() == nil }))
 
 	return r
-}
-
-func main() {
-	db, err := postgres.NewDb(
-		postgres.DbName("todo"),
-		postgres.Credentials("postgres", "postgres"),
-		postgres.HostAndPort("localhost", 5432),
-		postgres.SslDisabled(),
-	)
-	if err != nil {
-		panic(err)
-	}
-
-	http.ListenAndServe(":3000", router(db))
 }

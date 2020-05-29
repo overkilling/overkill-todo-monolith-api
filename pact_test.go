@@ -1,6 +1,6 @@
 // +build pact
 
-package main
+package todo
 
 import (
 	"fmt"
@@ -60,7 +60,7 @@ func startProvider() {
 		panic(err)
 	}
 
-	err = http.ListenAndServe(":3000", router(db))
+	err = http.ListenAndServe(":3000", Router(db))
 	if err != nil {
 		panic(err)
 	}

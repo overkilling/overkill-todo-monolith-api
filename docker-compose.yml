@@ -4,6 +4,8 @@ services:
   api:
     build:
       context: .
+    environment:
+      DB_HOST: db
     ports:
       - "3000:3000"
     expose:
