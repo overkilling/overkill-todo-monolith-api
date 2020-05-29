@@ -1,55 +1,68 @@
-// +build integration
-
 package todo
 
 import (
-	"fmt"
+	"context"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	_ "github.com/lib/pq"
 	"github.com/overkilling/overkill-todo-monolith-api/postgres"
 	"github.com/stretchr/testify/assert"
+	"github.com/testcontainers/testcontainers-go"
 )
 
-var dbBaseConfig = []postgres.ConfigOption{
-	postgres.Credentials("postgres", "postgres"),
-	postgres.HostAndPort("localhost", 5432),
-	postgres.SslDisabled(),
-}
-
-func recreateTestDb(dbName string) {
-	var err error
-
-	db, err := postgres.NewDb(dbBaseConfig...)
-	if err != nil {
-		panic(err)
-	}
-
-	_, err = db.Exec(fmt.Sprintf("DROP DATABASE IF EXISTS %s", dbName))
-	if err != nil {
-		panic(err)
-	}
-
-	_, err = db.Exec(fmt.Sprintf("CREATE DATABASE %s", dbName))
-	if err != nil {
-		panic(err)
-	}
-}
-
 func TestIntegrationRouter(t *testing.T) {
-	recreateTestDb("todo_test")
-	db, err := postgres.NewDb(append(dbBaseConfig, postgres.DbName("todo_test"))...)
+	if testing.Short() {
+		t.Skip("skipping integration tests.")
+	}
+
+	ctx := context.Background()
+	req := testcontainers.ContainerRequest{
+		Image:        "postgres:latest",
+		ExposedPorts: []string{"5432/tcp"},
+		Env: map[string]string{
+			"POSTGRES_USER":     "postgres",
+			"POSTGRES_PASSWORD": "postgres",
+			"POSTGRES_DB":       "todo",
+		},
+	}
+	postgresC, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
+		ContainerRequest: req,
+		Started:          true,
+	})
 	if err != nil {
 		panic(err)
 	}
+	defer postgresC.Terminate(ctx)
+
+	ip, err := postgresC.Host(ctx)
+	if err != nil {
+		panic(err)
+	}
+	port, err := postgresC.MappedPort(ctx, "5432")
+	if err != nil {
+		panic(err)
+	}
+
+	db, err := postgres.NewDb(
+		postgres.DbName("todo"),
+		postgres.Credentials("postgres", "postgres"),
+		postgres.HostAndPort(ip, port.Int()),
+		postgres.SslDisabled())
+	if err != nil {
+		panic(err)
+	}
+
+	// TODO: remove sleep waiting for db to be ready
+	time.Sleep(5 * time.Second)
 
 	res := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "http://localhost:3000/health", nil)
+	httpReq, _ := http.NewRequest("GET", "http://localhost:3000/health", nil)
 
-	Router(db).ServeHTTP(res, req)
+	Router(db).ServeHTTP(res, httpReq)
 
 	content, _ := ioutil.ReadAll(res.Body)
 	assert.Equal(t, "{\"status\":\"ok\"}", string(content))
