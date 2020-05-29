@@ -6,12 +6,12 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
 
 	_ "github.com/lib/pq"
 	"github.com/overkilling/overkill-todo-monolith-api/postgres"
 	"github.com/stretchr/testify/assert"
 	"github.com/testcontainers/testcontainers-go"
+	"github.com/testcontainers/testcontainers-go/wait"
 )
 
 func TestIntegrationRouter(t *testing.T) {
@@ -28,6 +28,10 @@ func TestIntegrationRouter(t *testing.T) {
 			"POSTGRES_PASSWORD": "postgres",
 			"POSTGRES_DB":       "todo",
 		},
+		WaitingFor: wait.ForAll(
+			wait.NewHostPortStrategy("5432/tcp"),
+			wait.ForLog("database system is ready to accept connections").WithOccurrence(2),
+		),
 	}
 	postgresC, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
 		ContainerRequest: req,
@@ -55,9 +59,6 @@ func TestIntegrationRouter(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-
-	// TODO: remove sleep waiting for db to be ready
-	time.Sleep(5 * time.Second)
 
 	res := httptest.NewRecorder()
 	httpReq, _ := http.NewRequest("GET", "http://localhost:3000/health", nil)
