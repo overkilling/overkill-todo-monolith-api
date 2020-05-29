@@ -9,9 +9,8 @@ import (
 
 	_ "github.com/lib/pq"
 	"github.com/overkilling/overkill-todo-monolith-api/postgres"
+	"github.com/overkilling/overkill-todo-monolith-api/testcontainers"
 	"github.com/stretchr/testify/assert"
-	"github.com/testcontainers/testcontainers-go"
-	"github.com/testcontainers/testcontainers-go/wait"
 )
 
 func TestIntegrationRouter(t *testing.T) {
@@ -20,33 +19,17 @@ func TestIntegrationRouter(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	req := testcontainers.ContainerRequest{
-		Image:        "postgres:latest",
-		ExposedPorts: []string{"5432/tcp"},
-		Env: map[string]string{
-			"POSTGRES_USER":     "postgres",
-			"POSTGRES_PASSWORD": "postgres",
-			"POSTGRES_DB":       "todo",
-		},
-		WaitingFor: wait.ForAll(
-			wait.NewHostPortStrategy("5432/tcp"),
-			wait.ForLog("database system is ready to accept connections").WithOccurrence(2),
-		),
-	}
-	postgresC, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
-		ContainerRequest: req,
-		Started:          true,
-	})
+	container, err := testcontainers.NewPostgresContainer(ctx)
 	if err != nil {
 		panic(err)
 	}
-	defer postgresC.Terminate(ctx)
+	defer container.Terminate(ctx)
 
-	ip, err := postgresC.Host(ctx)
+	ip, err := container.Host(ctx)
 	if err != nil {
 		panic(err)
 	}
-	port, err := postgresC.MappedPort(ctx, "5432")
+	port, err := container.MappedPort(ctx, "5432")
 	if err != nil {
 		panic(err)
 	}
@@ -59,11 +42,12 @@ func TestIntegrationRouter(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
+	defer db.Close()
 
 	res := httptest.NewRecorder()
-	httpReq, _ := http.NewRequest("GET", "http://localhost:3000/health", nil)
+	req, _ := http.NewRequest("GET", "http://localhost:3000/health", nil)
 
-	Router(db).ServeHTTP(res, httpReq)
+	Router(db).ServeHTTP(res, req)
 
 	content, _ := ioutil.ReadAll(res.Body)
 	assert.Equal(t, "{\"status\":\"ok\"}", string(content))
