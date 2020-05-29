@@ -10,4 +10,5 @@ require (
 	github.com/stretchr/testify v1.5.1
 	github.com/testcontainers/testcontainers-go v0.5.1
 	golang.org/x/net v0.0.0-20200519113804-d87ec0cfa476 // indirect
+	gotest.tools v0.0.0-20181223230014-1083505acf35
 )
