@@ -14,14 +14,12 @@ build:
 .PHONY: test
 test:
 	@echo "===Unit Tests==="
-	go test -cover ./...
+	go test -cover ./... -short
 
 .PHONY: integration
 integration:
 	@echo "===Integration Tests==="
-	docker-compose up -d db
-	go test -cover ./... -tags integration
-	docker-compose down
+	go test -cover ./... -run TestIntegrationRouter
 
 .PHONY: pact
 pact:
