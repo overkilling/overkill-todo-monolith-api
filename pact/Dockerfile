@@ -24,5 +24,5 @@ RUN go mod download
 COPY . .
 
 # Run pact tests
-CMD go test -v ./... -tags pact -run TestPactProvider
+CMD go test -v github.com/overkilling/overkill-todo-monolith-api/pact
 

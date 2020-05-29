@@ -1,4 +1,4 @@
-PACT_DOCKER_COMPOSE := docker-compose -f docker-compose.pact.yml
+PACT_DOCKER_COMPOSE := docker-compose -f pact/docker-compose.yml
 
 .PHONY: all
 all: test integration pact

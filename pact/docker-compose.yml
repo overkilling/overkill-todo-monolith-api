@@ -3,10 +3,11 @@ version: '3'
 services:
   pact:
     build:
-      context: .
-      dockerfile: ./Dockerfile.pact
+      context: ..
+      dockerfile: ./pact/Dockerfile
     environment:
       DB_HOST: db
+      PACT_URL: https://raw.githubusercontent.com/overkilling/overkill-todo-infrastructure/master/pacts/spa-api.json
     depends_on:
       - db
     networks:
