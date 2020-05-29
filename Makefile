@@ -5,7 +5,11 @@ all: test integration pact
 
 .PHONY: run
 run:
-	go run main.go
+	go run cmd/todoapi/main.go
+
+.PHONY: build
+build:
+	go build -o todoapi cmd/todoapi/main.go
 
 .PHONY: test
 test:
