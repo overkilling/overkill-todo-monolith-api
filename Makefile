@@ -14,12 +14,12 @@ build:
 .PHONY: test
 test:
 	@echo "===Unit Tests==="
-	go test -cover ./... -short
+	gotest -cover ./... -short
 
 .PHONY: integration
 integration:
 	@echo "===Integration Tests==="
-	go test -cover ./... -run TestIntegrationRouter
+	gotest -cover ./... -run TestIntegrationRouter
 
 .PHONY: pact
 pact:
