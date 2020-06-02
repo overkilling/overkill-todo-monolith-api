@@ -27,6 +27,18 @@ func healthcheckHandler(dbServiceAlive serviceUpCheck) http.HandlerFunc {
 	}
 }
 
+func getTodosHandler() http.HandlerFunc {
+	type Todo struct {
+		Todo string `json:"todo"`
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		todos := [1]Todo{{Todo: "Some task"}}
+		responseBytes, _ := json.Marshal(todos)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(responseBytes)
+	}
+}
+
 // Router provides REST endpoint routing for the Todo API
 func Router(db *sql.DB) http.Handler {
 	r := chi.NewRouter()
@@ -37,6 +49,7 @@ func Router(db *sql.DB) http.Handler {
 	r.Use(middleware.Heartbeat("/ping"))
 
 	r.Get("/health", healthcheckHandler(func() bool { return db.Ping() == nil }))
+	r.Get("/todos", getTodosHandler())
 
 	return r
 }

@@ -46,9 +46,14 @@ func TestIntegrationRouter(t *testing.T) {
 
 	res := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "http://localhost:3000/health", nil)
-
 	Router(db).ServeHTTP(res, req)
 
 	content, _ := ioutil.ReadAll(res.Body)
 	assert.Equal(t, "{\"status\":\"ok\"}", string(content))
+
+	req, _ = http.NewRequest("GET", "http://localhost:3000/todos", nil)
+	Router(db).ServeHTTP(res, req)
+
+	content, _ = ioutil.ReadAll(res.Body)
+	assert.Equal(t, "[{\"todo\":\"Some task\"}]", string(content))
 }
