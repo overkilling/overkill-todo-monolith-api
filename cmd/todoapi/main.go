@@ -22,5 +22,8 @@ func main() {
 		panic(err)
 	}
 
-	http.ListenAndServe(":3000", todo.Router(db))
+	err = http.ListenAndServe(":3000", todo.Router(db))
+	if err != nil {
+		panic(err)
+	}
 }
