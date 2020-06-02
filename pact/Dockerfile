@@ -25,4 +25,3 @@ COPY . .
 
 # Run pact tests
 CMD go test -v github.com/overkilling/overkill-todo-monolith-api/pact
-
