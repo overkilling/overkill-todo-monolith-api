@@ -4,6 +4,7 @@ go 1.12
 
 require (
 	github.com/go-chi/chi v4.1.1+incompatible
+	github.com/golang-migrate/migrate/v4 v4.11.0
 	github.com/lib/pq v1.5.2
 	github.com/pact-foundation/pact-go v1.4.1
 	github.com/rakyll/gotest v0.0.0-20200206190159-3023d5d6366c // indirect

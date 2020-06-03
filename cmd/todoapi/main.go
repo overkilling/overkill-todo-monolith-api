@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 
@@ -21,7 +22,16 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	defer db.Close()
 
+	fmt.Println("Applying migrations...")
+	err = postgres.MigrateDB(db, "file://./postgres/migrations")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Migrations done")
+
+	fmt.Println("Starting server on port 3000")
 	err = http.ListenAndServe(":3000", todo.Router(db))
 	if err != nil {
 		panic(err)
