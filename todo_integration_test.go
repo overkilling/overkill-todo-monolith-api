@@ -44,6 +44,11 @@ func TestIntegrationRouter(t *testing.T) {
 	}
 	defer db.Close()
 
+	err = postgres.MigrateDB(db, "file://./postgres/migrations")
+	if err != nil {
+		panic(err)
+	}
+
 	res := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "http://localhost:3000/health", nil)
 	Router(db).ServeHTTP(res, req)
