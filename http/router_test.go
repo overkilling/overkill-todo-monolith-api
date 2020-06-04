@@ -1,4 +1,4 @@
-package todo
+package http_test
 
 import (
 	"context"
@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	_ "github.com/lib/pq"
+	todoHttp "github.com/overkilling/overkill-todo-monolith-api/http"
 	"github.com/overkilling/overkill-todo-monolith-api/postgres"
 	"github.com/overkilling/overkill-todo-monolith-api/testcontainers"
 	"github.com/stretchr/testify/assert"
@@ -44,20 +45,20 @@ func TestIntegrationRouter(t *testing.T) {
 	}
 	defer db.Close()
 
-	err = postgres.MigrateDB(db, "file://./postgres/migrations")
+	err = postgres.MigrateDB(db, "file://../postgres/migrations")
 	if err != nil {
 		panic(err)
 	}
 
 	res := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "http://localhost:3000/health", nil)
-	Router(db).ServeHTTP(res, req)
+	todoHttp.Router(db).ServeHTTP(res, req)
 
 	content, _ := ioutil.ReadAll(res.Body)
 	assert.Equal(t, "{\"status\":\"ok\"}", string(content))
 
 	req, _ = http.NewRequest("GET", "http://localhost:3000/todos", nil)
-	Router(db).ServeHTTP(res, req)
+	todoHttp.Router(db).ServeHTTP(res, req)
 
 	content, _ = ioutil.ReadAll(res.Body)
 	assert.Equal(t, "[{\"todo\":\"Some task\"}]", string(content))
