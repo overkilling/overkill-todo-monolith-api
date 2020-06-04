@@ -1,12 +1,11 @@
 package pact
 
 import (
-	"net/http"
 	"os"
 	"testing"
 
 	_ "github.com/lib/pq"
-	todoHttp "github.com/overkilling/overkill-todo-monolith-api/http"
+	"github.com/overkilling/overkill-todo-monolith-api/http"
 	"github.com/overkilling/overkill-todo-monolith-api/postgres"
 	"github.com/pact-foundation/pact-go/dsl"
 	"github.com/pact-foundation/pact-go/types"
@@ -42,7 +41,7 @@ func startProvider() {
 		panic(err)
 	}
 
-	err = http.ListenAndServe(":3000", todoHttp.Router(db))
+	err = http.NewRouter(db).ServeOn(3000)
 	if err != nil {
 		panic(err)
 	}
