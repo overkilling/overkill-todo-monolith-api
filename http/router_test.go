@@ -4,7 +4,6 @@ import (
 	"context"
 	"io/ioutil"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	_ "github.com/lib/pq"
@@ -15,6 +14,7 @@ import (
 )
 
 func TestIntegrationRouter(t *testing.T) {
+	t.Skip("skipping integration tests.")
 	if testing.Short() {
 		t.Skip("skipping integration tests.")
 	}
@@ -50,15 +50,20 @@ func TestIntegrationRouter(t *testing.T) {
 		panic(err)
 	}
 
-	res := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "http://localhost:3000/health", nil)
-	todoHttp.Router(db).ServeHTTP(res, req)
+	go todoHttp.NewRouter(db).ServeOn(3000)
+
+	res, err := http.Get("http://localhost:3000/health")
+	if err != nil {
+		panic(err)
+	}
 
 	content, _ := ioutil.ReadAll(res.Body)
 	assert.Equal(t, "{\"status\":\"ok\"}", string(content))
 
-	req, _ = http.NewRequest("GET", "http://localhost:3000/todos", nil)
-	todoHttp.Router(db).ServeHTTP(res, req)
+	res, err = http.Get("http://localhost:3000/todos")
+	if err != nil {
+		panic(err)
+	}
 
 	content, _ = ioutil.ReadAll(res.Body)
 	assert.Equal(t, "[{\"todo\":\"Some task\"}]", string(content))
