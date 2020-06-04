@@ -19,5 +19,6 @@ RUN make build
 # Run stage
 FROM scratch
 COPY --from=build-stage /build/todoapi /
+COPY --from=build-stage /build/postgres/migrations /postgres/migrations
 EXPOSE 3000
 CMD ["/todoapi"]
