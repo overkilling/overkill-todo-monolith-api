@@ -1,7 +1,6 @@
 package http
 
 import (
-	"database/sql"
 	"fmt"
 	"net/http"
 
@@ -15,8 +14,15 @@ type Router struct {
 	mux *chi.Mux
 }
 
+// Endpoints specifies the Todo API endpoint configurations as
+// a list of http.Handlers.
+type Endpoints struct {
+	Healthcheck http.HandlerFunc
+	Todos       http.HandlerFunc
+}
+
 // NewRouter provides REST endpoint routing for the Todo API
-func NewRouter(db *sql.DB) *Router {
+func NewRouter(endpoints Endpoints) *Router {
 	mux := chi.NewRouter()
 
 	mux.Use(middleware.RequestID)
@@ -24,8 +30,8 @@ func NewRouter(db *sql.DB) *Router {
 	mux.Use(middleware.Recoverer)
 	mux.Use(middleware.Heartbeat("/ping"))
 
-	mux.Get("/health", NewHealthcheckHandler(func() bool { return db.Ping() == nil }))
-	mux.Get("/todos", NewTodosHandler())
+	mux.Get("/health", endpoints.Healthcheck)
+	mux.Get("/todos", endpoints.Todos)
 
 	return &Router{mux}
 }

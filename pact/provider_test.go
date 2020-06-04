@@ -41,7 +41,16 @@ func startProvider() {
 		panic(err)
 	}
 
-	err = http.NewRouter(db).ServeOn(3000)
+	err = postgres.MigrateDB(db, "file://../postgres/migrations")
+	if err != nil {
+		panic(err)
+	}
+
+	endpoints := http.Endpoints{
+		Healthcheck: http.NewHealthcheckHandler(func() bool { return db.Ping() == nil }),
+		Todos:       http.NewTodosHandler(),
+	}
+	err = http.NewRouter(endpoints).ServeOn(3000)
 	if err != nil {
 		panic(err)
 	}

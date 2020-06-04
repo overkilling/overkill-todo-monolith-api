@@ -30,8 +30,12 @@ func main() {
 	}
 	fmt.Println("Migrations done")
 
+	endpoints := http.Endpoints{
+		Healthcheck: http.NewHealthcheckHandler(func() bool { return db.Ping() == nil }),
+		Todos:       http.NewTodosHandler(),
+	}
 	fmt.Println("Starting server on port 3000")
-	err = http.NewRouter(db).ServeOn(3000)
+	err = http.NewRouter(endpoints).ServeOn(3000)
 	if err != nil {
 		panic(err)
 	}
