@@ -5,6 +5,7 @@ import (
 	"os"
 
 	_ "github.com/lib/pq"
+	todo "github.com/overkilling/overkill-todo-monolith-api"
 	"github.com/overkilling/overkill-todo-monolith-api/http"
 	"github.com/overkilling/overkill-todo-monolith-api/postgres"
 )
@@ -30,9 +31,16 @@ func main() {
 	}
 	fmt.Println("Migrations done")
 
+	hardcodedTodos := func() []todo.Todo {
+		return []todo.Todo{
+			{Todo: "Some task"},
+			{Todo: "Another task"},
+		}
+	}
+
 	endpoints := http.Endpoints{
 		Healthcheck: http.NewHealthcheckHandler(func() bool { return db.Ping() == nil }),
-		Todos:       http.NewTodosHandler(),
+		Todos:       http.NewTodosHandler(hardcodedTodos),
 	}
 	fmt.Println("Starting server on port 3000")
 	err = http.NewRouter(endpoints).ServeOn(3000)
