@@ -6,7 +6,7 @@ import (
 	"os"
 
 	_ "github.com/lib/pq"
-	todo "github.com/overkilling/overkill-todo-monolith-api"
+	todoHttp "github.com/overkilling/overkill-todo-monolith-api/http"
 	"github.com/overkilling/overkill-todo-monolith-api/postgres"
 )
 
@@ -32,7 +32,7 @@ func main() {
 	fmt.Println("Migrations done")
 
 	fmt.Println("Starting server on port 3000")
-	err = http.ListenAndServe(":3000", todo.Router(db))
+	err = http.ListenAndServe(":3000", todoHttp.Router(db))
 	if err != nil {
 		panic(err)
 	}

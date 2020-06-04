@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	_ "github.com/lib/pq"
-	todo "github.com/overkilling/overkill-todo-monolith-api"
+	todoHttp "github.com/overkilling/overkill-todo-monolith-api/http"
 	"github.com/overkilling/overkill-todo-monolith-api/postgres"
 	"github.com/pact-foundation/pact-go/dsl"
 	"github.com/pact-foundation/pact-go/types"
@@ -42,7 +42,7 @@ func startProvider() {
 		panic(err)
 	}
 
-	err = http.ListenAndServe(":3000", todo.Router(db))
+	err = http.ListenAndServe(":3000", todoHttp.Router(db))
 	if err != nil {
 		panic(err)
 	}
