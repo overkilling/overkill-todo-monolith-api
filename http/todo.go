@@ -7,11 +7,12 @@ import (
 	todo "github.com/overkilling/overkill-todo-monolith-api"
 )
 
+type fetchTodos func() []todo.Todo
+
 // NewTodosHandler creates a HTTP handler for serving a list of todos.
-func NewTodosHandler() http.HandlerFunc {
+func NewTodosHandler(fetch fetchTodos) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		todos := [1]todo.Todo{{Todo: "Some task"}}
-		responseBytes, _ := json.Marshal(todos)
+		responseBytes, _ := json.Marshal(fetch())
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(responseBytes)
 	}

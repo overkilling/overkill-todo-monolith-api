@@ -6,16 +6,31 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	todo "github.com/overkilling/overkill-todo-monolith-api"
 	todoHttp "github.com/overkilling/overkill-todo-monolith-api/http"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGetTodosHandler(t *testing.T) {
+	fecher := func() []todo.Todo {
+		return []todo.Todo{
+			{Todo: "Some todo"},
+			{Todo: "Another todo"},
+			{Todo: "Yet another todo"},
+		}
+	}
+
 	res := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "http://localhost:3000/todos", nil)
 
-	todoHttp.NewTodosHandler()(res, req)
+	todoHttp.NewTodosHandler(fecher)(res, req)
 
 	content, _ := ioutil.ReadAll(res.Body)
-	assert.Equal(t, "[{\"todo\":\"Some task\"}]", string(content))
+	assert.JSONEq(t, `
+		[
+			{"todo": "Some todo"},
+			{"todo": "Another todo"},
+			{"todo": "Yet another todo"}
+		]
+	`, string(content))
 }
