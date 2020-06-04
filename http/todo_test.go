@@ -12,12 +12,12 @@ import (
 )
 
 func TestGetTodosHandler(t *testing.T) {
-	fecher := func() []todo.Todo {
+	fecher := func() ([]todo.Todo, error) {
 		return []todo.Todo{
 			{Todo: "Some todo"},
 			{Todo: "Another todo"},
 			{Todo: "Yet another todo"},
-		}
+		}, nil
 	}
 
 	res := httptest.NewRecorder()

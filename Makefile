@@ -21,7 +21,7 @@ test: ${GOTEST}
 .PHONY: integration
 integration: ${GOTEST}
 	@echo "===Integration Tests==="
-	gotest -cover ./... -run TestIntegrationRouter
+	gotest -cover ./... -run TestGetAllTodos
 
 .PHONY: pact
 pact:
