@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	_ "github.com/lib/pq"
-	todo "github.com/overkilling/overkill-todo-monolith-api"
 	"github.com/overkilling/overkill-todo-monolith-api/http"
 	"github.com/overkilling/overkill-todo-monolith-api/postgres"
 	"github.com/pact-foundation/pact-go/dsl"
@@ -47,16 +46,11 @@ func startProvider() {
 		panic(err)
 	}
 
-	hardcodedTodos := func() []todo.Todo {
-		return []todo.Todo{
-			{Todo: "Some task"},
-			{Todo: "Another task"},
-		}
-	}
+	todosRepository := postgres.NewTodosRepository(db)
 
 	endpoints := http.Endpoints{
 		Healthcheck: http.NewHealthcheckHandler(func() bool { return db.Ping() == nil }),
-		Todos:       http.NewTodosHandler(hardcodedTodos),
+		Todos:       http.NewTodosHandler(todosRepository.GetAll),
 	}
 	err = http.NewRouter(endpoints).ServeOn(3000)
 	if err != nil {
