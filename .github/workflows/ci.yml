@@ -16,12 +16,18 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: ^1.13
-      - name: Install dependencies
-        run: go mod download
-      - name: Build package
-        run: go build -v .
-      - name: Run ci tests
-        run: make all
+      - name: Spike
+        run: |
+          echo ${{ github.ref }}
+          echo ${{ github.sha }}
+          echo ${{ github.repository }}
+      - name: Repository Dispatch
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          repository: overkilling/overkill-todo-infrastructure
+          event-type: new_api_version
+          client-payload: '{"repository": "${{ github.repository }}", "image_version": "$(echo sha-$(git rev-parse --short HEAD))"}'
 
   build-and-push-container:
     runs-on: ubuntu-latest
