@@ -39,3 +39,12 @@ jobs:
           repository: overkilling/overkill-todo-monolith-api/api
           tag_with_ref: true
           tag_with_sha: true
+      - name: Set IMAGE_VERSION
+        run: echo ::set-env name=IMAGE_VERSION::$(echo sha-$(git rev-parse --short HEAD))
+      - name: Notify infrastructure of new image
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.BOT_TOKEN }}
+          repository: overkilling/overkill-todo-infrastructure
+          event-type: new-image-version
+          client-payload: '{"repository": "${{ github.repository }}", "image_version": "${{ env.IMAGE_VERSION }}"}'
