@@ -23,15 +23,45 @@ Below is colorful architecture diagram:
 ![Diagram](/.github/diagram.png?raw=true)
 
 This is a fairly [standard architecture style](https://martinfowler.com/bliki/PresentationDomainDataLayering.html), and it could considered a good starting point for most applications.
-If/when an application grows in complexity and features, other patterns could be considered, such as  microservices, event sourcing, CQRS and other.
+If/when an application grows in complexity and features, other patterns could be considered, such as  microservices, event sourcing, CQRS and many more.
 Hopefully these other patterns will be explored in other overkill implementations, so they can be evaluated and compared.
+
+In this simple architecture, the SPA and API components where implemented in a slighlty overkill fashion.
+This means that, even though the problem space can be considered quite simple, the solution has been overengineered to exercise and highlight certain techniques and methodologies.
+E.g. both `BasicAuth` and `JWT` authentication methods will be supported, it will include REST and `GraphQL` APIs, logs and metrics will be gathered.
+The intent is to provide some practice to the developer and, perhaps, some education to the readers.
+
+Although this repository only contains the API component, there's an [infrastructure repository](https://github.com/overkilling/overkill-todo-infrastructure) which ties the whole application together.
+It allows to start the application locally through `docker-compose`, but it doesn't deploy it yet to any real environment.
+
+## API endpoints
+
+Note that, as there are currently no notion of users, all endpoints fetch and modify a global state.
+
+### `GET /todos`
+
+Lists all todos.
+
+Example response:
+
+```
+[
+  { "todo": "Some todo" },
+  { "todo": "Another todo" },
+  { "todo": "Yet another todo" }
+]
+```
 
 ## Getting started
 
-Clone the codebase to your local environment:
+The code has been developed and test with Golang version 1.14.3.
+
+To get started with the API, clone the codebase to your local environment and install all prequisites:
 
 ```
-git@github.com:overkilling/overkill-todo-monolith-api.git
+git clone git@github.com:overkilling/overkill-todo-monolith-api.git
+cd overkill-todo-monolith-api
+go mod download
 ```
 
 ### Running the application
@@ -62,20 +92,4 @@ make pact
 make all # runs all of the above
 ```
 
-## Endpoints
-
-Note that, as there are currently no notion of users, all endpoints fetch and modify a global state.
-
-### `GET /todos`
-
-Lists all todos.
-
-Example response:
-
-```
-[
-  { "todo": "Some todo" },
-  { "todo": "Another todo" },
-  { "todo": "Yet another todo" }
-]
-```
+### Github Actions
