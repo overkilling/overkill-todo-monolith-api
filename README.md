@@ -66,20 +66,22 @@ go mod download
 
 ### Running the application
 
-To quickly start the application from the cloned code, you can run the following:
+There are a few ways of running the application, from a quick and dirty way to running the "full stack".
+
+To quickly start the application from the cloned code, you can run the following (assuming you have a Postgres database already running):
 
 ```
 make run
 ```
 
-To run it through Docker, you can use the following `docker-compose` command (the `--build` will generate a new docker image):
+It is possible to also run it through docker, using `docker-compose`. The benefit is that it will also start up a database, although it will take a bit longer to build the image. The command is:
 
 ```
 docker-compose --build up
 ```
 
 There is also the [infrastructure repository](https://github.com/overkilling/overkill-todo-infrastructure), which contains instructions and code to run the whole application locally, including the frontend and the observability stack (`fluentd`, `elasticsearch`, etc).
-
+For more info, checkout the repo.
 
 ### Testing
 
@@ -93,3 +95,5 @@ make all # runs all of the above
 ```
 
 ### Github Actions
+
+TODO
