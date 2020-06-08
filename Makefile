@@ -2,8 +2,8 @@ BIN_DIR := $(GOPATH)/bin
 GOTEST := $(BIN_DIR)/gotest
 PACT_DOCKER_COMPOSE := docker-compose -f pact/docker-compose.yml
 
-.PHONY: all
-all: test integration pact
+.PHONY: ci
+all: test pact
 
 .PHONY: run
 run:
@@ -13,15 +13,15 @@ run:
 build:
 	go build -o todoapi cmd/todoapi/main.go
 
-.PHONY: test
-test: ${GOTEST}
-	@echo "===Unit Tests==="
+.PHONY: only_unit
+only_unit: ${GOTEST}
+	@echo "===Only Unit Tests==="
 	gotest -cover ./... -short
 
-.PHONY: integration
-integration: ${GOTEST}
-	@echo "===Integration Tests==="
-	gotest -cover ./... -run TestGetAllTodos
+.PHONY: test
+test: ${GOTEST}
+	@echo "===All Tests==="
+	gotest -cover ./...
 
 .PHONY: pact
 pact:

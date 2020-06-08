@@ -88,10 +88,10 @@ For more info, checkout the repo.
 There three levels of tests: unit, integration and pact tests. You can run them by:
 
 ```
-make unit
-make integration
+make only_unit # only runs unit tests using the -short flag
+make test # run both unit and integration tests
 make pact
-make all # runs all of the above
+make ci # runs test and pact
 ```
 
 ### Github Actions
