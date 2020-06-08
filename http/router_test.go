@@ -1,11 +1,15 @@
 package http_test
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net"
 	"net/http"
+	"strconv"
 	"testing"
+	"time"
 
 	_ "github.com/lib/pq"
 	todoHttp "github.com/overkilling/overkill-todo-monolith-api/http"
@@ -18,6 +22,10 @@ func TestRouter(t *testing.T) {
 		Todos:       testGetHandler("todos"),
 	}
 	go todoHttp.NewRouter(config).ServeOn(3000)
+	err := waitForServer(3000)
+	if err != nil {
+		panic(err)
+	}
 
 	tt := []struct {
 		endpoint string
@@ -48,4 +56,17 @@ func testGetHandler(response string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		io.WriteString(w, response)
 	}
+}
+
+func waitForServer(port int) error {
+	address := net.JoinHostPort("localhost", strconv.Itoa(port))
+
+	conn, err := net.DialTimeout("tcp", address, 5*time.Second)
+	if err != nil {
+		return err
+	}
+	if conn == nil {
+		return errors.New("Could not connect")
+	}
+	return nil
 }
