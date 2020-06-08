@@ -23,9 +23,7 @@ func TestRouter(t *testing.T) {
 	}
 	go todoHttp.NewRouter(config).ServeOn(3000)
 	err := waitForServer(3000)
-	if err != nil {
-		panic(err)
-	}
+	assert.NoError(t, err, "failed to wait for server to start")
 
 	tt := []struct {
 		endpoint string
@@ -37,15 +35,10 @@ func TestRouter(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.endpoint, func(t *testing.T) {
 			res, err := http.Get(fmt.Sprintf("http://localhost:3000%s", tc.endpoint))
-			if err != nil {
-				panic(err)
-			}
+			assert.NoError(t, err, "failed to create request")
 
 			content, err := ioutil.ReadAll(res.Body)
-			if err != nil {
-				panic(err)
-			}
-
+			assert.NoError(t, err, "failed to read response's body")
 			assert.Equal(t, tc.expected, string(content))
 
 		})
