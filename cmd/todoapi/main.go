@@ -1,12 +1,12 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	_ "github.com/lib/pq"
 	"github.com/overkilling/overkill-todo-monolith-api/http"
 	"github.com/overkilling/overkill-todo-monolith-api/postgres"
+	"github.com/rs/zerolog/log"
 )
 
 func main() {
@@ -23,19 +23,19 @@ func main() {
 	}
 	defer db.Close()
 
-	fmt.Println("Applying migrations...")
+	log.Info().Str("type", "migrations").Msg("Applying migrations...")
 	err = postgres.MigrateDB(db, "file://./postgres/migrations")
 	if err != nil {
-		panic(err)
+		log.Fatal().Str("type", "migrations").Err(err).Msg("Failed to apply migrations")
 	}
-	fmt.Println("Migrations done")
+	log.Info().Str("type", "migrations").Msg("Migrations done")
 	todosRepository := postgres.NewTodosRepository(db)
 
 	endpoints := http.Endpoints{
 		Healthcheck: http.NewHealthcheckHandler(func() bool { return db.Ping() == nil }),
 		Todos:       http.NewTodosHandler(todosRepository.GetAll),
 	}
-	fmt.Println("Starting server on port 3000")
+	log.Info().Str("type", "startup").Msg("Starting server on port 3000")
 	err = http.NewRouter(endpoints).ServeOn(3000)
 	if err != nil {
 		panic(err)
