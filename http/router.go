@@ -28,8 +28,10 @@ type Endpoints struct {
 func NewRouter(endpoints Endpoints, log zerolog.Logger) *Router {
 	mux := chi.NewRouter()
 
-	mux.Use(middleware.RequestID)
 	mux.Use(hlog.NewHandler(log))
+	mux.Use(hlog.MethodHandler("http_method"))
+	mux.Use(hlog.URLHandler("url"))
+	mux.Use(hlog.RequestIDHandler("request_id", "Request-ID"))
 	mux.Use(hlog.AccessHandler(accessHandlerLogging))
 	mux.Use(middleware.Recoverer)
 	mux.Use(middleware.Heartbeat("/ping"))
@@ -51,5 +53,8 @@ func (router *Router) Serve(w http.ResponseWriter, r *http.Request) {
 }
 
 func accessHandlerLogging(r *http.Request, status, size int, duration time.Duration) {
-	hlog.FromRequest(r).Info().Msg("something")
+	hlog.FromRequest(r).Info().
+		Int("http_status", status).
+		Int("response_size", size).
+		Send()
 }

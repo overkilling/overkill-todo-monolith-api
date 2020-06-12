@@ -53,13 +53,23 @@ func TestLogging(t *testing.T) {
 	out := &bytes.Buffer{}
 	log := zerolog.New(out).With().Logger()
 
+	resp := httptest.NewRecorder()
 	req, err := http.NewRequest("GET", "http://localhost:3000/some-endpoint", nil)
 	assert.NoError(t, err, "failed to create request")
 
-	todoHttp.NewRouter(todoHttp.Endpoints{}, log).
-		Serve(httptest.NewRecorder(), req)
+	todoHttp.NewRouter(todoHttp.Endpoints{}, log).Serve(resp, req)
 
-	assert.Equal(t, "{\"level\":\"info\",\"message\":\"something\"}\n", string(out.Bytes()))
+	expectedLog := fmt.Sprintf(`
+		{
+			"level": "info",
+			"http_status": 404,
+			"http_method": "GET",
+			"url": "http://localhost:3000/some-endpoint",
+			"response_size": 19,
+			"request_id": "%s"
+		}
+	`, resp.HeaderMap.Get("Request-ID"))
+	assert.JSONEq(t, expectedLog, string(out.Bytes()))
 }
 
 func testGetHandler(response string) http.HandlerFunc {
