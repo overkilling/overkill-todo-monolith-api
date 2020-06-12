@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
+	"net/http/httptest"
 	"strconv"
 	"testing"
 	"time"
@@ -51,14 +52,12 @@ func TestRouting(t *testing.T) {
 func TestLogging(t *testing.T) {
 	out := &bytes.Buffer{}
 	log := zerolog.New(out).With().Logger()
-	config := todoHttp.Endpoints{
-		Todos: testGetHandler("some-endpoint"),
-	}
-	go todoHttp.NewRouter(config, log).ServeOn(3000)
-	err := waitForServer(3000)
-	assert.NoError(t, err, "failed to wait for server to start")
 
-	http.Get("http://localhost:3000/some-endpoint")
+	req, err := http.NewRequest("GET", "http://localhost:3000/some-endpoint", nil)
+	assert.NoError(t, err, "failed to create request")
+
+	todoHttp.NewRouter(todoHttp.Endpoints{}, log).
+		Serve(httptest.NewRecorder(), req)
 
 	assert.Equal(t, "{\"level\":\"info\",\"message\":\"something\"}\n", string(out.Bytes()))
 }
