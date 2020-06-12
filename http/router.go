@@ -3,10 +3,12 @@ package http
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/hlog"
 )
 
 // Router represents a Todo's HTTP router, with the appropriate endpoints
@@ -24,11 +26,11 @@ type Endpoints struct {
 
 // NewRouter provides REST endpoint routing for the Todo API
 func NewRouter(endpoints Endpoints, log zerolog.Logger) *Router {
-	log.Info().Msg("something")
 	mux := chi.NewRouter()
 
 	mux.Use(middleware.RequestID)
-	mux.Use(middleware.Logger)
+	mux.Use(hlog.NewHandler(log))
+	mux.Use(hlog.AccessHandler(accessHandlerLogging))
 	mux.Use(middleware.Recoverer)
 	mux.Use(middleware.Heartbeat("/ping"))
 
@@ -41,4 +43,13 @@ func NewRouter(endpoints Endpoints, log zerolog.Logger) *Router {
 // ServeOn serves the router endpoints on the supplied port.
 func (router *Router) ServeOn(port int) error {
 	return http.ListenAndServe(fmt.Sprintf(":%d", port), router.mux)
+}
+
+// Serve a HTTP request
+func (router *Router) Serve(w http.ResponseWriter, r *http.Request) {
+	router.mux.ServeHTTP(w, r)
+}
+
+func accessHandlerLogging(r *http.Request, status, size int, duration time.Duration) {
+	hlog.FromRequest(r).Info().Msg("something")
 }
