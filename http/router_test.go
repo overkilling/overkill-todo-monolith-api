@@ -1,6 +1,7 @@
 package http_test
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -13,15 +14,18 @@ import (
 
 	_ "github.com/lib/pq"
 	todoHttp "github.com/overkilling/overkill-todo-monolith-api/http"
+	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestRouter(t *testing.T) {
+func TestRouting(t *testing.T) {
+	out := &bytes.Buffer{}
+	log := zerolog.New(out).With().Logger()
 	config := todoHttp.Endpoints{
 		Healthcheck: testGetHandler("healthcheck"),
 		Todos:       testGetHandler("todos"),
 	}
-	go todoHttp.NewRouter(config).ServeOn(3000)
+	go todoHttp.NewRouter(config, log).ServeOn(3000)
 	err := waitForServer(3000)
 	assert.NoError(t, err, "failed to wait for server to start")
 
@@ -40,9 +44,23 @@ func TestRouter(t *testing.T) {
 			content, err := ioutil.ReadAll(res.Body)
 			assert.NoError(t, err, "failed to read response's body")
 			assert.Equal(t, tc.expected, string(content))
-
 		})
 	}
+}
+
+func TestLogging(t *testing.T) {
+	out := &bytes.Buffer{}
+	log := zerolog.New(out).With().Logger()
+	config := todoHttp.Endpoints{
+		Todos: testGetHandler("some-endpoint"),
+	}
+	go todoHttp.NewRouter(config, log).ServeOn(3000)
+	err := waitForServer(3000)
+	assert.NoError(t, err, "failed to wait for server to start")
+
+	http.Get("http://localhost:3000/some-endpoint")
+
+	assert.Equal(t, "{\"level\":\"info\",\"message\":\"something\"}\n", string(out.Bytes()))
 }
 
 func testGetHandler(response string) http.HandlerFunc {

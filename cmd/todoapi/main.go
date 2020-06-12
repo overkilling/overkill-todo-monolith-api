@@ -6,10 +6,14 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/overkilling/overkill-todo-monolith-api/http"
 	"github.com/overkilling/overkill-todo-monolith-api/postgres"
-	"github.com/rs/zerolog/log"
+	"github.com/rs/zerolog"
 )
 
 func main() {
+	log := zerolog.New(os.Stdout).With().
+		Timestamp().
+		Str("service", "api").
+		Logger()
 	dbHost := os.Getenv("DB_HOST")
 
 	db, err := postgres.NewDb(
@@ -36,7 +40,7 @@ func main() {
 		Todos:       http.NewTodosHandler(todosRepository.GetAll),
 	}
 	log.Info().Str("type", "startup").Msg("Starting server on port 3000")
-	err = http.NewRouter(endpoints).ServeOn(3000)
+	err = http.NewRouter(endpoints, log).ServeOn(3000)
 	if err != nil {
 		panic(err)
 	}

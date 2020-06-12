@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"github.com/rs/zerolog"
 )
 
 // Router represents a Todo's HTTP router, with the appropriate endpoints
@@ -22,7 +23,8 @@ type Endpoints struct {
 }
 
 // NewRouter provides REST endpoint routing for the Todo API
-func NewRouter(endpoints Endpoints) *Router {
+func NewRouter(endpoints Endpoints, log zerolog.Logger) *Router {
+	log.Info().Msg("something")
 	mux := chi.NewRouter()
 
 	mux.Use(middleware.RequestID)
