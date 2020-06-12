@@ -9,6 +9,7 @@ import (
 	"github.com/overkilling/overkill-todo-monolith-api/postgres"
 	"github.com/pact-foundation/pact-go/dsl"
 	"github.com/pact-foundation/pact-go/types"
+	"github.com/rs/zerolog"
 )
 
 func TestPactProvider(t *testing.T) {
@@ -31,6 +32,10 @@ func TestPactProvider(t *testing.T) {
 }
 
 func startProvider() {
+	log := zerolog.New(os.Stdout).With().
+		Timestamp().
+		Str("service", "api").
+		Logger()
 	db, err := postgres.NewDb(
 		postgres.DbName("todo"),
 		postgres.Credentials("postgres", "postgres"),
@@ -52,7 +57,7 @@ func startProvider() {
 		Healthcheck: http.NewHealthcheckHandler(func() bool { return db.Ping() == nil }),
 		Todos:       http.NewTodosHandler(todosRepository.GetAll),
 	}
-	err = http.NewRouter(endpoints).ServeOn(3000)
+	err = http.NewRouter(endpoints, log).ServeOn(3000)
 	if err != nil {
 		panic(err)
 	}
