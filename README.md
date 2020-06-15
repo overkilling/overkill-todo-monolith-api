@@ -3,6 +3,11 @@
 > Beat the drum, beat the drum, beat forever on the endless march - Motörhead
 
 ![CI](https://github.com/overkilling/overkill-todo-monolith-api/workflows/CI/badge.svg?branch=master)
+![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/overkilling/overkill-todo-monolith-api)
+[![GoDoc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat)](https://godoc.org/github.com/overkilling/overkill-todo-monolith-api)
+[![Go Report Card](https://goreportcard.com/badge/github.com/overkilling/overkill-todo-monolith-api)](https://goreportcard.com/report/github.com/overkilling/overkill-todo-monolith-api)
+[![GitHub license](https://img.shields.io/github/license/overkilling/overkill-todo-monolith-api)](https://github.com/overkilling/overkill-todo-monolith-api/blob/master/LICENSE)
+
 
 An overkill implementation of a backend API for serving todos, implemented in Go and backed by a Postgres database.
 It is a monolith as it handles todos, users, events and anything else the Todo frontend needs.
