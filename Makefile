@@ -6,8 +6,8 @@ PACT_DOCKER_COMPOSE := docker-compose -f pact/docker-compose.yml
 all: test pact
 
 .PHONY: run
-run:
-	go run cmd/todoapi/*.go
+run: build
+	./todoapi
 
 .PHONY: build
 build:

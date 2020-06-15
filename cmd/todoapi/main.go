@@ -7,20 +7,19 @@ import (
 	"github.com/overkilling/overkill-todo-monolith-api/http"
 	"github.com/overkilling/overkill-todo-monolith-api/postgres"
 	"github.com/rs/zerolog"
-	"github.com/spf13/viper"
 )
 
 func main() {
-	configureViper()
+	config := loadConfig()
 	log := zerolog.New(os.Stdout).With().
 		Timestamp().
 		Str("service", "api").
 		Logger()
 
 	db, err := postgres.NewDb(
-		postgres.DbName(viper.GetString("db.database")),
-		postgres.Credentials(viper.GetString("db.username"), viper.GetString("db.password")),
-		postgres.HostAndPort(viper.GetString("db.host"), viper.GetInt("db.port")),
+		postgres.DbName(config.db.database),
+		postgres.Credentials(config.db.username, config.db.password),
+		postgres.HostAndPort(config.db.host, config.db.port),
 		postgres.SslDisabled(),
 	)
 	if err != nil {

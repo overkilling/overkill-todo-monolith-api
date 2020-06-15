@@ -19,3 +19,29 @@ func configureViper() {
 
 	viper.ReadInConfig()
 }
+
+type config struct {
+	db dbConfig
+}
+
+type dbConfig struct {
+	host     string
+	port     int
+	database string
+	username string
+	password string
+}
+
+func loadConfig() config {
+	configureViper()
+
+	return config{
+		db: dbConfig{
+			host:     viper.GetString("db.host"),
+			port:     viper.GetInt("db.port"),
+			database: viper.GetString("db.database"),
+			username: viper.GetString("db.username"),
+			password: viper.GetString("db.password"),
+		},
+	}
+}
