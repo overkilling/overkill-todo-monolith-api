@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"strings"
 
 	_ "github.com/lib/pq"
 	"github.com/overkilling/overkill-todo-monolith-api/http"
@@ -10,26 +11,31 @@ import (
 	"github.com/spf13/viper"
 )
 
-func getDbHost() string {
-	viper.SetDefault("db_host", "localhost")
+func configureViper() {
+	viper.SetDefault("db.host", "localhost")
+	viper.SetDefault("db.port", 5432)
+	viper.SetDefault("db.database", "todo")
+	viper.SetDefault("db.username", "postgres")
+	viper.SetDefault("db.password", "postgres")
+
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.AutomaticEnv()
 	viper.AddConfigPath(".")
-	viper.ReadInConfig()
 
-	return viper.GetString("db_host")
+	viper.ReadInConfig()
 }
 
 func main() {
+	configureViper()
 	log := zerolog.New(os.Stdout).With().
 		Timestamp().
 		Str("service", "api").
 		Logger()
-	dbHost := getDbHost()
 
 	db, err := postgres.NewDb(
-		postgres.DbName("todo"),
-		postgres.Credentials("postgres", "postgres"),
-		postgres.HostAndPort(dbHost, 5432),
+		postgres.DbName(viper.GetString("db.database")),
+		postgres.Credentials(viper.GetString("db.username"), viper.GetString("db.password")),
+		postgres.HostAndPort(viper.GetString("db.host"), viper.GetInt("db.port")),
 		postgres.SslDisabled(),
 	)
 	if err != nil {
