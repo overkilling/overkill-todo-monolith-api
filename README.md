@@ -88,6 +88,35 @@ docker-compose --build up
 There is also the [infrastructure repository](https://github.com/overkilling/overkill-todo-infrastructure), which contains instructions and code to run the whole application locally, including the frontend and the observability stack (`fluentd`, `elasticsearch`, etc).
 For more info, checkout the repo.
 
+### Configuration
+
+It is possible to configure the application through a config file or environment variables.
+The possible configuration settings are :
+
+| Name | Config | Environment Variable | Default value |
+| ---- | ------ | -------------------- | ------------- |
+| Database host | `db.host` | `DB_HOST` | `localhost` |
+| Database port | `db.port`| `DB_PORT` | `5432` |
+| Database name | `db.database` | `DB_DATABASE` | `todo` |
+| Database user | `db.username` | `DB_USERNAME` | `postgres` |
+| Database password | `db.password` | `DB_PASSWORD` | `postgres` |
+| Pretty logging | `log.pretty` | `LOG_PRETTY` | `false` |
+
+
+#### Example configuration file
+
+```
+db:
+  host: localhost
+  port: 5432
+  database: some-todos
+  username: some-user
+  password: super-secret
+log:
+  pretty: true
+```
+
+
 ### Testing
 
 There three levels of tests: unit, integration and pact tests. You can run them by:
