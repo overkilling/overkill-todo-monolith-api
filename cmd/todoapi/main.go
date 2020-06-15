@@ -7,14 +7,24 @@ import (
 	"github.com/overkilling/overkill-todo-monolith-api/http"
 	"github.com/overkilling/overkill-todo-monolith-api/postgres"
 	"github.com/rs/zerolog"
+	"github.com/spf13/viper"
 )
+
+func getDbHost() string {
+	viper.SetDefault("db_host", "localhost")
+	viper.AutomaticEnv()
+	viper.AddConfigPath(".")
+	viper.ReadInConfig()
+
+	return viper.GetString("db_host")
+}
 
 func main() {
 	log := zerolog.New(os.Stdout).With().
 		Timestamp().
 		Str("service", "api").
 		Logger()
-	dbHost := os.Getenv("DB_HOST")
+	dbHost := getDbHost()
 
 	db, err := postgres.NewDb(
 		postgres.DbName("todo"),
