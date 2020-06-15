@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io"
 	"os"
 
 	_ "github.com/lib/pq"
@@ -11,7 +12,13 @@ import (
 
 func main() {
 	config := loadConfig()
-	log := zerolog.New(os.Stdout).With().
+
+	var logOutput io.Writer
+	logOutput = os.Stdout
+	if config.log.pretty {
+		logOutput = zerolog.ConsoleWriter{Out: os.Stdout}
+	}
+	log := zerolog.New(logOutput).With().
 		Timestamp().
 		Str("service", "api").
 		Logger()

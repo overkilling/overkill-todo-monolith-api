@@ -16,6 +16,7 @@ func TestLoadConfig(t *testing.T) {
 		assert.Equal(t, "todo", config.db.database)
 		assert.Equal(t, "postgres", config.db.username)
 		assert.Equal(t, "postgres", config.db.password)
+		assert.Equal(t, false, config.log.pretty)
 	})
 	t.Run("from environment variables", func(t *testing.T) {
 		os.Setenv("DB_HOST", "hostfromenv")
@@ -23,6 +24,7 @@ func TestLoadConfig(t *testing.T) {
 		os.Setenv("DB_DATABASE", "dbfromenv")
 		os.Setenv("DB_USERNAME", "userfromenv")
 		os.Setenv("DB_PASSWORD", "passfromenv")
+		os.Setenv("LOG_PRETTY", "true")
 
 		config := loadConfig()
 
@@ -31,5 +33,6 @@ func TestLoadConfig(t *testing.T) {
 		assert.Equal(t, "dbfromenv", config.db.database)
 		assert.Equal(t, "userfromenv", config.db.username)
 		assert.Equal(t, "passfromenv", config.db.password)
+		assert.Equal(t, true, config.log.pretty)
 	})
 }
