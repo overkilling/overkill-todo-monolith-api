@@ -7,11 +7,11 @@ all: test pact
 
 .PHONY: run
 run:
-	go run cmd/todoapi/main.go
+	go run cmd/todoapi/*.go
 
 .PHONY: build
 build:
-	go build -o todoapi cmd/todoapi/main.go
+	go build -o todoapi cmd/todoapi/*.go
 
 .PHONY: only_unit
 only_unit: ${GOTEST}
