@@ -80,13 +80,18 @@ func testGetHandler(response string) http.HandlerFunc {
 
 func waitForServer(port int) error {
 	address := net.JoinHostPort("localhost", strconv.Itoa(port))
+	retries := 5
 
-	conn, err := net.DialTimeout("tcp", address, 5*time.Second)
-	if err != nil {
-		return err
+	for retries > 0 {
+		conn, err := net.Dial("tcp", address)
+		if err == nil && conn != nil {
+			conn.Close()
+			return nil
+		}
+
+		retries--
+		time.Sleep(10 * time.Second)
 	}
-	if conn == nil {
-		return errors.New("Could not connect")
-	}
-	return nil
+
+	return errors.New("Could not connect")
 }
