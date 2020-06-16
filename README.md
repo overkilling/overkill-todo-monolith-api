@@ -119,14 +119,45 @@ log:
 
 ### Testing
 
-There three levels of tests: unit, integration and pact tests. You can run them by:
+The testing strategy is to have unit and integration tests in Go and Pact tests executed as part of a Docker setup.
+
+All tests can be executed by:
 
 ```
-make only_unit # only runs unit tests using the -short flag
-make test # run both unit and integration tests
-make pact
-make ci # runs test and pact
+make ci
 ```
+
+#### Unit and Integration tests
+
+The Go integration tests require a postgres database.
+Instead of expecting the database to be up and running, or to hava a Docker/Docker Compose setup, the tests will use [testcontainers](https://github.com/testcontainers/testcontainers-go) to spin up and teardown a postgres container as part of its execution.
+This will ensure that the repository can be cloned and all tests can be executed without requiring aditional steps.
+
+To run all Go tests:
+
+```
+make test
+```
+
+Optionally, to run only the unit tests (or fast tests):
+
+```
+make only_unit # equivalent of passing the -short flag
+```
+
+#### Pact tests
+
+The provider execution of the pact tests is done through a Docker Compose setup under `/pact`. The reasoning for it is that [pact-go](https://github.com/pact-foundation/pact-go) requires a Ruby module.
+
+To execute the provider tests:
+
+```
+make pact
+```
+
+It's worth noting that the tests will use https://raw.githubusercontent.com/overkilling/overkill-todo-infrastructure/master/pacts/spa-api.json as the contract.
+Ideally a Pact Broker could be used, to mediate the valid consumer and provider versions.
+
 
 ### Github Actions
 
