@@ -3,7 +3,7 @@ GOTEST := $(BIN_DIR)/gotest
 PACT_DOCKER_COMPOSE := docker-compose -f pact/docker-compose.yml
 
 .PHONY: ci
-all: test pact
+ci: test pact
 
 .PHONY: run
 run: build
