@@ -6,8 +6,8 @@ import (
 
 	_ "github.com/lib/pq"
 	"github.com/overkilling/overkill-todo-monolith-api/http"
+	"github.com/overkilling/overkill-todo-monolith-api/observability/prometheus"
 	"github.com/overkilling/overkill-todo-monolith-api/postgres"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/zerolog"
 )
 
@@ -44,7 +44,7 @@ func main() {
 	todosRepository := postgres.NewTodosRepository(db)
 
 	endpoints := http.Endpoints{
-		Metrics:     promhttp.Handler().ServeHTTP,
+		Metrics:     prometheus.Handler().ServeHTTP,
 		Healthcheck: http.NewHealthcheckHandler(func() bool { return db.Ping() == nil }),
 		Todos:       http.NewTodosHandler(todosRepository.GetAll),
 	}
