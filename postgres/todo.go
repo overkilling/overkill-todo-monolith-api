@@ -14,7 +14,7 @@ type TodosRepository struct {
 
 // NewTodosRepository creates a new Todos repository backed by a
 // Postgres db.
-func NewTodosRepository(db *sql.DB) *TodosRepository {
+func NewTodosRepository(db *sql.DB) todo.TodosRepository {
 	return &TodosRepository{db}
 }
 
