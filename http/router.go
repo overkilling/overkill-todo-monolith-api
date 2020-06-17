@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/hlog"
 )
@@ -36,6 +37,7 @@ func NewRouter(endpoints Endpoints, log zerolog.Logger) *Router {
 	mux.Use(middleware.Recoverer)
 	mux.Use(middleware.Heartbeat("/ping"))
 
+	mux.Handle("/metrics", promhttp.Handler())
 	mux.Get("/health", endpoints.Healthcheck)
 	mux.Get("/todos", endpoints.Todos)
 
