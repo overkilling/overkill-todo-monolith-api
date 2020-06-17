@@ -27,7 +27,7 @@ func TestInstrumentation(t *testing.T) {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Test handler"))
 	}
-	prometheus.Instrument("test", http.HandlerFunc(handler)).ServeHTTP(res, testreq)
+	prometheus.InstrumentHandler("test", http.HandlerFunc(handler)).ServeHTTP(res, testreq)
 
 	content := getPrometheusMetrics(t)
 	assert.Contains(t, content, `test_handler_requests_total{code="200",method="get"} 1`)

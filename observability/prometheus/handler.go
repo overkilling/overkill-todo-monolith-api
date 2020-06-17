@@ -16,8 +16,8 @@ func Handler() http.Handler {
 	return promhttp.Handler()
 }
 
-// Instrument a HTTP handler with counter, duration and inflight metrics.
-func Instrument(label string, handler http.Handler) http.Handler {
+// InstrumentHandler a HTTP handler with counter, duration and inflight metrics.
+func InstrumentHandler(label string, handler http.Handler) http.Handler {
 	requestCounter := promauto.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: fmt.Sprintf("%s_handler_requests_total", label),
