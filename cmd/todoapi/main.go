@@ -41,7 +41,8 @@ func main() {
 		log.Fatal().Str("type", "migrations").Err(err).Msg("Failed to apply migrations")
 	}
 	log.Info().Str("type", "migrations").Msg("Migrations done")
-	todosRepository := postgres.NewTodosRepository(db)
+	todosRepository := prometheus.InstrumentTodosRepository(
+		postgres.NewTodosRepository(db))
 
 	endpoints := http.Endpoints{
 		Metrics:     prometheus.Handler().ServeHTTP,
