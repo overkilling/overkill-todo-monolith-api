@@ -57,6 +57,21 @@ Example response:
 ]
 ```
 
+### `GET /health`
+
+Healthcheck endpoint, validates database connection is functional.
+
+Example response:
+
+```
+{"status":"ok"}
+```
+
+### `GET /metrics`
+
+[Prometheus](https://prometheus.io/) metrics endpoint. 
+
+
 ## Getting started
 
 The code has been developed and test with Golang version 1.14.3.
