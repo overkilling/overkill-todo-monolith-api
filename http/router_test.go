@@ -23,6 +23,7 @@ func TestRouting(t *testing.T) {
 	out := &bytes.Buffer{}
 	log := zerolog.New(out).With().Logger()
 	config := todoHttp.Endpoints{
+		Metrics:     testGetHandler("metrics"),
 		Healthcheck: testGetHandler("healthcheck"),
 		Todos:       testGetHandler("todos"),
 	}
@@ -34,6 +35,7 @@ func TestRouting(t *testing.T) {
 		endpoint string
 		expected string
 	}{
+		{endpoint: "/metrics", expected: "metrics"},
 		{endpoint: "/health", expected: "healthcheck"},
 		{endpoint: "/todos", expected: "todos"},
 	}

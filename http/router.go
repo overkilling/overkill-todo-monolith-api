@@ -7,7 +7,6 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/hlog"
 )
@@ -21,6 +20,7 @@ type Router struct {
 // Endpoints specifies the Todo API endpoint configurations as
 // a list of http.Handlers.
 type Endpoints struct {
+	Metrics     http.HandlerFunc
 	Healthcheck http.HandlerFunc
 	Todos       http.HandlerFunc
 }
@@ -37,7 +37,7 @@ func NewRouter(endpoints Endpoints, log zerolog.Logger) *Router {
 	mux.Use(middleware.Recoverer)
 	mux.Use(middleware.Heartbeat("/ping"))
 
-	mux.Handle("/metrics", promhttp.Handler())
+	mux.Get("/metrics", endpoints.Metrics)
 	mux.Get("/health", endpoints.Healthcheck)
 	mux.Get("/todos", endpoints.Todos)
 
