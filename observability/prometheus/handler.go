@@ -9,7 +9,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-var instrumentationLabels = []string{"code", "method"}
+var handlerInstrumentationLabels = []string{"code", "method"}
 
 // Handler wraps Prometheus package handler
 func Handler() http.Handler {
@@ -23,7 +23,7 @@ func Instrument(label string, handler http.Handler) http.Handler {
 			Name: fmt.Sprintf("%s_handler_requests_total", label),
 			Help: fmt.Sprintf("Total number of %s requests by HTTP code and method", label),
 		},
-		instrumentationLabels,
+		handlerInstrumentationLabels,
 	)
 	inFlightGauge := promauto.NewGauge(
 		prometheus.GaugeOpts{
@@ -36,7 +36,7 @@ func Instrument(label string, handler http.Handler) http.Handler {
 			Name: fmt.Sprintf("%s_handler_requests_duration", label),
 			Help: fmt.Sprintf("Histogram of %s request durations in seconds", label),
 		},
-		instrumentationLabels,
+		handlerInstrumentationLabels,
 	)
 
 	return promhttp.InstrumentHandlerCounter(requestCounter,
