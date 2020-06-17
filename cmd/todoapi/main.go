@@ -45,8 +45,8 @@ func main() {
 
 	endpoints := http.Endpoints{
 		Metrics:     prometheus.Handler().ServeHTTP,
-		Healthcheck: http.NewHealthcheckHandler(func() bool { return db.Ping() == nil }),
-		Todos:       http.NewTodosHandler(todosRepository.GetAll),
+		Healthcheck: prometheus.Instrument("healthcheck", http.NewHealthcheckHandler(func() bool { return db.Ping() == nil })).ServeHTTP,
+		Todos:       prometheus.Instrument("todos", http.NewTodosHandler(todosRepository.GetAll)).ServeHTTP,
 	}
 	log.Info().Str("type", "startup").Msg("Starting server on port 3000")
 	err = http.NewRouter(endpoints, log).ServeOn(3000)
