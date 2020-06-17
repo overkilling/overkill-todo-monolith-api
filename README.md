@@ -173,10 +173,19 @@ make pact
 It's worth noting that the tests will use https://raw.githubusercontent.com/overkilling/overkill-todo-infrastructure/master/pacts/spa-api.json as the contract.
 Ideally a Pact Broker could be used, to mediate the valid consumer and provider versions.
 
+### Observability
 
-### Github Actions
+Currently there are two observability types implemented in the project:
 
-The Continuous Integration (CI) tooling used in this project is [Github Actions](https://github.com/features/actions), mainly because it's free and easy to use.
+* Logging: structured logs produced by [zerolog](https://github.com/rs/zerolog), shipped to ELK stack in the [infrastructure](https://github.com/overkilling/overkill-todo-infrastructure) repository.
+* Metrics: captured by the [prometheus Go client](https://github.com/prometheus/client_golang)
+
+There [is an argument](https://peter.bourgon.org/blog/2016/02/07/logging-v-instrumentation.html) that logging all requests is not a great idea, specially if the application has a high-volume. But, for completeness and learning, I will leave it in.
+
+
+### Continuous Integration (CI)
+
+The CI tooling used in this project is [Github Actions](https://github.com/features/actions), mainly because it's free and easy to use.
 
 The CI workflow, defined `.github/workflows/ci.yml`, is:
 
