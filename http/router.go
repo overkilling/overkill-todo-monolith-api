@@ -7,7 +7,6 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-	internalZerolog "github.com/overkilling/overkill-todo-monolith-api/observability/zerolog"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/hlog"
 )
@@ -27,7 +26,7 @@ type Endpoints struct {
 }
 
 // NewRouter provides REST endpoint routing for the Todo API
-func NewRouter(endpoints Endpoints, log zerolog.Logger) *Router {
+func NewRouter(endpoints Endpoints, log zerolog.Logger, panicHandlers ...RecovererPanicHandler) *Router {
 	mux := chi.NewRouter()
 
 	mux.Use(hlog.NewHandler(log))
@@ -35,7 +34,7 @@ func NewRouter(endpoints Endpoints, log zerolog.Logger) *Router {
 	mux.Use(hlog.URLHandler("url"))
 	mux.Use(hlog.RequestIDHandler("request_id", "Request-ID"))
 	mux.Use(hlog.AccessHandler(accessHandlerLogging))
-	mux.Use(Recoverer(internalZerolog.NewPanicHandler()))
+	mux.Use(Recoverer(panicHandlers...))
 	mux.Use(middleware.Heartbeat("/ping"))
 
 	mux.Get("/metrics", endpoints.Metrics)
