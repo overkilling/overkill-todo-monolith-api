@@ -40,7 +40,7 @@ func main() {
 		Todos:       prometheus.InstrumentHandler("todos", http.NewTodosHandler(todosRepository.GetAll)).ServeHTTP,
 	}
 	log.Info().Str("type", "startup").Msg("Starting server on port 3000")
-	err = http.NewRouter(endpoints, log).ServeOn(3000)
+	err = http.NewRouter(endpoints, log, zerolog.NewPanicHandler(), prometheus.NewPanicHandler()).ServeOn(3000)
 	if err != nil {
 		panic(err)
 	}
