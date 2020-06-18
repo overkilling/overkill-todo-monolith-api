@@ -35,7 +35,7 @@ func NewRouter(endpoints Endpoints, log zerolog.Logger) *Router {
 	mux.Use(hlog.URLHandler("url"))
 	mux.Use(hlog.RequestIDHandler("request_id", "Request-ID"))
 	mux.Use(hlog.AccessHandler(accessHandlerLogging))
-	mux.Use(Recoverer(internalZerolog.NewPanicHandler(log)))
+	mux.Use(Recoverer(internalZerolog.NewPanicHandler()))
 	mux.Use(middleware.Heartbeat("/ping"))
 
 	mux.Get("/metrics", endpoints.Metrics)

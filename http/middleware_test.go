@@ -21,7 +21,7 @@ type testPanicHandler struct {
 	handlerCalled bool
 }
 
-func (handler *testPanicHandler) HandlePanic(panicReason interface{}) {
+func (handler *testPanicHandler) HandlePanic(r *realHttp.Request, panicReason interface{}) {
 	handler.handlerCalled = panicReason == "some error"
 }
 
