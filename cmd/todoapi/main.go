@@ -1,29 +1,19 @@
 package main
 
 import (
-	"io"
 	"os"
 
 	_ "github.com/lib/pq"
 	"github.com/overkilling/overkill-todo-monolith-api/http"
 	"github.com/overkilling/overkill-todo-monolith-api/observability/prometheus"
+	"github.com/overkilling/overkill-todo-monolith-api/observability/zerolog"
 	"github.com/overkilling/overkill-todo-monolith-api/postgres"
-	"github.com/rs/zerolog"
 )
 
 func main() {
 	config := loadConfig()
 
-	var logOutput io.Writer
-	logOutput = os.Stdout
-	if config.log.pretty {
-		logOutput = zerolog.ConsoleWriter{Out: os.Stdout}
-	}
-	log := zerolog.New(logOutput).With().
-		Timestamp().
-		Str("service", "api").
-		Logger()
-
+	log := zerolog.NewLogger(os.Stdout, config.log.pretty)
 	db, err := postgres.NewDb(
 		postgres.DbName(config.db.database),
 		postgres.Credentials(config.db.username, config.db.password),
