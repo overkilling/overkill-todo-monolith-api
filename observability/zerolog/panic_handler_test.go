@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"net/http"
 	"testing"
 
 	"github.com/overkilling/overkill-todo-monolith-api/observability/zerolog"
@@ -33,9 +34,10 @@ func TestPanicHandler(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			out := &bytes.Buffer{}
 			log := realZerolog.New(out).With().Logger()
-			panicHandler := zerolog.NewPanicHandler(log)
+			req, _ := http.NewRequest("GET", "http://localhost:3000/some-endpoint", nil)
+			req = req.WithContext(log.WithContext(req.Context()))
 
-			panicHandler.HandlePanic(tc.panicReason)
+			zerolog.NewPanicHandler().HandlePanic(req, tc.panicReason)
 
 			expectedLog := fmt.Sprintf(`{
 				"level": "error",
