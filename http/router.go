@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	internalZerolog "github.com/overkilling/overkill-todo-monolith-api/observability/zerolog"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/hlog"
 )
@@ -34,7 +35,7 @@ func NewRouter(endpoints Endpoints, log zerolog.Logger) *Router {
 	mux.Use(hlog.URLHandler("url"))
 	mux.Use(hlog.RequestIDHandler("request_id", "Request-ID"))
 	mux.Use(hlog.AccessHandler(accessHandlerLogging))
-	mux.Use(Recoverer())
+	mux.Use(Recoverer(internalZerolog.NewPanicHandler(log)))
 	mux.Use(middleware.Heartbeat("/ping"))
 
 	mux.Get("/metrics", endpoints.Metrics)
