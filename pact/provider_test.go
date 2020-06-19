@@ -5,11 +5,8 @@ import (
 	"testing"
 
 	_ "github.com/lib/pq"
-	"github.com/overkilling/overkill-todo-monolith-api/http"
-	"github.com/overkilling/overkill-todo-monolith-api/postgres"
 	"github.com/pact-foundation/pact-go/dsl"
 	"github.com/pact-foundation/pact-go/types"
-	"github.com/rs/zerolog"
 )
 
 func TestPactProvider(t *testing.T) {
@@ -17,49 +14,19 @@ func TestPactProvider(t *testing.T) {
 	if pactURL == "" {
 		t.Skip("set PACT_URL to run this test")
 	}
-
-	go startProvider()
+	providerURL := os.Getenv("PROVIDER_URL")
+	if providerURL == "" {
+		t.Skip("set PROVIDER_URL to run this test")
+	}
 
 	pact := createPact()
 	_, err := pact.VerifyProvider(t, types.VerifyRequest{
-		ProviderBaseURL: "http://127.0.0.1:3000",
+		ProviderBaseURL: providerURL,
 		PactURLs:        []string{pactURL},
 	})
 
 	if err != nil {
 		t.Log("Pact test failed")
-	}
-}
-
-func startProvider() {
-	log := zerolog.New(os.Stdout).With().
-		Timestamp().
-		Str("service", "api").
-		Logger()
-	db, err := postgres.NewDb(
-		postgres.DbName("todo"),
-		postgres.Credentials("postgres", "postgres"),
-		postgres.HostAndPort(os.Getenv("DB_HOST"), 5432),
-		postgres.SslDisabled(),
-	)
-	if err != nil {
-		panic(err)
-	}
-
-	err = postgres.MigrateDB(db, "file://../postgres/migrations")
-	if err != nil {
-		panic(err)
-	}
-
-	todosRepository := postgres.NewTodosRepository(db)
-
-	endpoints := http.Endpoints{
-		Healthcheck: http.NewHealthcheckHandler(func() bool { return db.Ping() == nil }),
-		Todos:       http.NewTodosHandler(todosRepository.GetAll),
-	}
-	err = http.NewRouter(endpoints, log).ServeOn(3000)
-	if err != nil {
-		panic(err)
 	}
 }
 
