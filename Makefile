@@ -26,7 +26,10 @@ test: ${GOTEST}
 .PHONY: pact
 pact:
 	@echo "===Pact==="
-	$(PACT_DOCKER_COMPOSE) up --build --abort-on-container-exit
+	$(PACT_DOCKER_COMPOSE) down --volumes
+	$(PACT_DOCKER_COMPOSE) up -d db
+	$(PACT_DOCKER_COMPOSE) up -d --build api
+	$(PACT_DOCKER_COMPOSE) up --build --abort-on-container-exit pact
 	$(PACT_DOCKER_COMPOSE) down --volumes
 
 $(GOTEST):
