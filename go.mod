@@ -19,6 +19,7 @@ require (
 	github.com/spf13/viper v1.7.0
 	github.com/stretchr/testify v1.5.1
 	github.com/testcontainers/testcontainers-go v0.5.1
+	github.com/xeipuuv/gojsonschema v1.2.0
 	golang.org/x/net v0.0.0-20200519113804-d87ec0cfa476 // indirect
 	golang.org/x/sys v0.0.0-20200610111108-226ff32320da // indirect
 	gopkg.in/ini.v1 v1.57.0 // indirect
