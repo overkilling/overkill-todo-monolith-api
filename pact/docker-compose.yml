@@ -7,7 +7,9 @@ services:
       dockerfile: ./pact/Dockerfile
     environment:
       PROVIDER_URL: http://api:3000 
-      PACT_URL: https://raw.githubusercontent.com/overkilling/overkill-todo-infrastructure/master/pacts/spa-api.json
+      PACT_URL: ${PACT_URL:-https://raw.githubusercontent.com/overkilling/overkill-todo-infrastructure/master/pacts/spa-api.json}
+    volumes:
+      - .:/pact
     depends_on:
       - api
     networks:
