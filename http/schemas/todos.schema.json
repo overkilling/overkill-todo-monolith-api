@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "array",
+  "items": {
+    "$ref": "#/definitions/Todo"
+  },
+  "definitions": {
+    "Todo": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "todo": {
+          "type": "string"
+        }
+      },
+      "required": ["todo"],
+      "title": "Todo"
+    }
+  }
+}
